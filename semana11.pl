@@ -30,7 +30,7 @@ conectado(x,c,10).
 conectado(f,d,10).
 
 
-
+% Sumar los valores de una lista
 sumar_lista([], 0).
 sumar_lista([Cabeza|Cola], Suma):-
           sumar_lista(Cola, Valor),
@@ -40,7 +40,6 @@ sumar_lista([Cabeza|Cola], Suma):-
 % findall([X,Lista_Distancia],ruta(i,c,Ruta,Lista_Distancia),Resultados).
 
 ruta(Ini,Fin, Res, Suma):- ruta_temp(Ini,Fin,[],Res,[],Suma, 0).
-
 ruta_temp(Fin,Fin,Lista,Res,Lista2,Suma,Total):-
     reverse([Fin|Lista],Res),
     reverse(Lista2, Suma).
@@ -48,31 +47,42 @@ ruta_temp(Fin,Fin,Lista,Res,Lista2,Suma,Total):-
     %write(Suma),
    % write(" = "),
     %write( Total ),nl.
-
-
 ruta_temp(Ini, Fin, Vecinos, Res,ListaPeso, Sum, Total) :-
     conectado(Ini,Vecino,Distancia),
     not(member(Vecino, Vecinos)),
     Suma is Total  + Distancia,
     ruta_temp(Vecino,Fin, [Ini|Vecinos], Res,[Distancia|ListaPeso], Sum, Suma).
 
+%Para obtener el segundo valor de una lista
 segundo_elemento([_|X], X).
+
+%Para obtener el primer valor de una lista
 primer_elemento([X|_],X).
 
-lista([],_).
-lista([X|Xs],ListaAux):-
+menor(Lista, Menor) :-
+      select(Menor, Lista, Rest), \+ (member(E, Rest), E < Menor).
+
+
+recorrer_lista([],Lista,_) :-
+    menor(Lista, Maximo),
+    write("La distancia mas cercana es: "),
+    write(Maximo).
+recorrer_lista([X|Xs],Lista,Rutas):-
     segundo_elemento(X,C),
+    primer_elemento(X,E),
     primer_elemento(C,D),
+    write(E),
+    write(" = "),
     write(D),
     write(" = "),
     sumar_lista(D,Total),
     write(Total),nl,
-    lista(Xs,ListaAux).
+    recorrer_lista(Xs,[Total|Lista],[E|Rutas]).
 
 
-buscar_todos(Inicio, Final) :-
+ruta_corta(Inicio, Final) :-
     findall([X,Peso],ruta(Inicio,Final,X,Peso),Resultados),
-    lista(Resultados,ListaAux).
+    recorrer_lista(Resultados,[],[]).
 
 
 % Para ver los datos
@@ -96,6 +106,7 @@ buscar_todos(Inicio, Final) :-
 
 % 2) Hacer laberinto y montarlo en un grafo y imprimir la solucion y
 % cuando se encuentra la solucion, mostrarla ya que es solo una
+%
 % 3) Averiguar la ruta mas
 % corta con : findall([X,Peso],ruta(i,c,X,Peso),Resultados)
 
